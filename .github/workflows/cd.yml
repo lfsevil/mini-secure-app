@@ -11,10 +11,10 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Parar despliegue anterior
-        run: docker-compose down || true
+        run: docker compose down || true
         
       - name: Construir y levantar aplicación
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
         
       - name: Ver contenedores
         run: docker ps
