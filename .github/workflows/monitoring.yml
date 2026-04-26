@@ -1,19 +1,31 @@
-name: Monitorización - Health Check
+name: Deploy Monitoring
 on:
-  schedule:
-    - cron: '*/30 * * * *' # Se ejecuta cada 30 minutos
-  workflow_dispatch:      # Permite ejecución manual para las capturas
+  push:
+    branches:
+      - desarrollo
+    paths:
+      - 'monitoring/**'
+      - '.github/workflows/monitoring.yml'
 
 jobs:
-  health-check:
+  deploy-monitoring:
     runs-on: self-hosted
     steps:
-      - name: Comprobar disponibilidad de la URL
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Show files
+        run: ls -R
+        
+      - name: Stop old monitoring stack
         run: |
-          HTTP_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001)
-          if [ "$HTTP_RESPONSE" -eq 200 ]; then
-            echo "La aplicación está UP (HTTP 200)"
-          else
-            echo "ALERTA: La aplicación está DOWN (HTTP $HTTP_RESPONSE)"
-            exit 1
-          fi
+          cd monitoring
+          docker compose down || true
+          
+      - name: Start monitoring stack
+        run: |
+          cd monitoring
+          docker compose up -d
+          
+      - name: Show running containers
+        run: docker ps
