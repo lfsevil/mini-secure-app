@@ -21,3 +21,9 @@ jobs:
         
       - name: Ver logs
         run: docker logs mini-secure-app --tail 50
+
+      - name: Esperar a que arranque la aplicacion
+        run: sleep 10
+
+      - name: Comprobar aplicación
+        run: curl http://localhost:3001
